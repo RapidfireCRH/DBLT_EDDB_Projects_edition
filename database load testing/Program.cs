@@ -112,7 +112,6 @@ namespace database_load_testing
         public static user_st work(user_st user)
         {
             Random r = new Random(user.jumprange + (int)user.lastjump.Ticks);
-            NpgsqlConnection conn = new NpgsqlConnection("SERVER=cyberlord.de; Port=5432; Database=edmc_rse_db; User ID=edmc_rse_user; Password=asdfplkjiouw3875948zksmdxnf;Timeout=12;Application Name=stresstest-"+user.name);
             while (user.jumpnum != user.history.Length)
             {
                 if (user.lastjump.Add(user.next_query_time) < DateTime.Now)
@@ -138,6 +137,7 @@ namespace database_load_testing
                         "systems.x BETWEEN " + (user.x - query_size[user.query]) + " AND " + (user.x + query_size[user.query]) + " AND " +
                         "systems.y BETWEEN " + (user.y - query_size[user.query]) + " AND " + (user.y + query_size[user.query]) + " AND " +
                         "systems.z BETWEEN " + (user.z - query_size[user.query]) + " AND " + (user.z + query_size[user.query]);
+                    NpgsqlConnection conn = new NpgsqlConnection("Pooling=false; SERVER=cyberlord.de; Port=5432; Database=edmc_rse_db; User ID=edmc_rse_user; Password=asdfplkjiouw3875948zksmdxnf;Timeout=12;Application Name=stresstest-" + user.name);
                     conn.Open();
                     NpgsqlTransaction tran = conn.BeginTransaction();
                     NpgsqlCommand command = new NpgsqlCommand(user.history[user.jumpnum].query, conn);
