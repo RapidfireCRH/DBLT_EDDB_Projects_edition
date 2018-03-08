@@ -12,7 +12,7 @@ namespace database_load_testing
 {
     class Program
     {
-        public static readonly int[] query_size = { 50, 61,  83,  127, 215, 391, 743, 1447, 2855, 5671};
+        public static readonly int[] queryRadius = { 50, 61,  83,  127, 215, 391, 743, 1447, 2855, 5671};
         static readonly int usernum = 5;//Number of user to simulate
         static readonly int maxjumpnum = 10;
         public struct user_st
@@ -133,9 +133,9 @@ namespace database_load_testing
                     //query
                     DateTime start = DateTime.Now;
                     user.history[user.jumpnum].query = "SELECT * FROM systems WHERE " +
-                        "systems.x BETWEEN " + (user.x - query_size[user.query]) + " AND " + (user.x + query_size[user.query]) + " AND " +
-                        "systems.y BETWEEN " + (user.y - query_size[user.query]) + " AND " + (user.y + query_size[user.query]) + " AND " +
-                        "systems.z BETWEEN " + (user.z - query_size[user.query]) + " AND " + (user.z + query_size[user.query]);
+                        "systems.x BETWEEN " + (user.x - queryRadius[user.query]) + " AND " + (user.x + queryRadius[user.query]) + " AND " +
+                        "systems.y BETWEEN " + (user.y - queryRadius[user.query]) + " AND " + (user.y + queryRadius[user.query]) + " AND " +
+                        "systems.z BETWEEN " + (user.z - queryRadius[user.query]) + " AND " + (user.z + queryRadius[user.query]);
                     NpgsqlConnection conn = new NpgsqlConnection("Pooling=false; SERVER=cyberlord.de; Port=5432; Database=edmc_rse_db; User ID=edmc_rse_user; Password=asdfplkjiouw3875948zksmdxnf;Timeout=12;Application Name=stresstest-" + user.name);
                     conn.Open();
                     NpgsqlTransaction tran = conn.BeginTransaction();
