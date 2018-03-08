@@ -64,6 +64,7 @@ namespace database_load_testing
             //init
             Random r = new Random((int)DateTime.Today.Ticks);
             List<Thread> group = new List<Thread>();
+            writer.Add("User, Jump Number, Query, Result Number, Delay");
             for(int i = 0; i!= usernum; i++)
             {
                 user_st user = new user_st();
