@@ -13,7 +13,7 @@ namespace database_load_testing
     class Program
     {
         public static readonly int[] query_size = { 50, 61,  83,  127, 215, 391, 743, 1447, 2855, 5671};
-        static readonly int usernum = 10;//Number of user to simulate
+        static readonly int usernum = 5;//Number of user to simulate
         static readonly int maxjumpnum = 10;
         public struct user_st
         {
@@ -95,6 +95,8 @@ namespace database_load_testing
                         numofactivethreads++;
                 Thread.Sleep(1000);
             }
+            if (!Directory.Exists("worker"))
+                Directory.CreateDirectory("worker");
             File.WriteAllLines("worker\\work.csv", writer);
         }
         public static void worker(user_st user)
