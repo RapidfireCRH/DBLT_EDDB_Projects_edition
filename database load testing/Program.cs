@@ -136,7 +136,7 @@ namespace database_load_testing
                     user.history[user.jumpnum].query = "SELECT * FROM systems WHERE " +
                         "systems.x BETWEEN " + (user.x - queryRadius[user.query]) + " AND " + (user.x + queryRadius[user.query]) + " AND " +
                         "systems.y BETWEEN " + (user.y - queryRadius[user.query]) + " AND " + (user.y + queryRadius[user.query]) + " AND " +
-                        "systems.z BETWEEN " + (user.z - queryRadius[user.query]) + " AND " + (user.z + queryRadius[user.query]);
+                        "systems.z BETWEEN " + (user.z - queryRadius[user.query]) + " AND " + (user.z + queryRadius[user.query] + " AND deleted_at is NULL;");
                     NpgsqlConnection conn = new NpgsqlConnection("Pooling=false; SERVER=cyberlord.de; Port=5432; Database=edmc_rse_db; User ID=edmc_rse_user; Password=asdfplkjiouw3875948zksmdxnf;Timeout=12;Application Name=stresstest-" + user.name);
                     conn.Open();
                     NpgsqlTransaction tran = conn.BeginTransaction();
@@ -159,7 +159,8 @@ namespace database_load_testing
                         user.query++;
                     else if (user.history[user.jumpnum].resultnum > 100 && user.query > 0)
                         user.query--;
-                    user.jumpnum++;
+                    if (user.history[user.jumpnum].resultnum != 0)//If i get 0 results, run again
+                        user.jumpnum++;
                 }
                 else
                     Thread.Sleep(((user.lastjump.Add(user.next_query_time) - DateTime.Now).TotalSeconds > new TimeSpan(0,0,2).TotalSeconds ? (user.lastjump.Add(user.next_query_time) - DateTime.Now) : new TimeSpan(1)));
