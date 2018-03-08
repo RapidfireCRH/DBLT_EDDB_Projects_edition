@@ -13,8 +13,8 @@ namespace database_load_testing
     class Program
     {
         public static readonly int[] query_size = { 50, 61,  83,  127, 215, 391, 743, 1447, 2855, 5671};
-        static readonly int usernum = 1000;//Number of user to simulate
-        static readonly int maxjumpnum = 200;
+        static readonly int usernum = 5;//Number of user to simulate
+        static readonly int maxjumpnum = 10;
         public struct user_st
         {
             public string name;
@@ -64,6 +64,7 @@ namespace database_load_testing
             //init
             Random r = new Random((int)DateTime.Today.Ticks);
             List<Thread> group = new List<Thread>();
+            writer.Add("User, Jump Number, Query, Result Number, Delay");
             for(int i = 0; i!= usernum; i++)
             {
                 user_st user = new user_st();
