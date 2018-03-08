@@ -13,8 +13,8 @@ namespace database_load_testing
     class Program
     {
         public static readonly int[] query_size = { 50, 61,  83,  127, 215, 391, 743, 1447, 2855, 5671};
-        static readonly int usernum = 100;//Number of user to simulate
-        static readonly int maxjumpnum = 10;
+        static readonly int usernum = 1000;//Number of user to simulate
+        static readonly int maxjumpnum = 200;
         public struct user_st
         {
             public string name;
@@ -58,6 +58,7 @@ namespace database_load_testing
             public double y;
             public double z;
         }
+        public static List<string> writer = new List<string>();
         static void Main()
         {
             //init
@@ -94,20 +95,17 @@ namespace database_load_testing
                         numofactivethreads++;
                 Thread.Sleep(1000);
             }
+            if (!Directory.Exists("worker"))
+                Directory.CreateDirectory("worker");
+            File.WriteAllLines("worker\\work.csv", writer);
         }
         public static void worker(user_st user)
         {
             user_st save = work(user);
             if (!Directory.Exists("Workers"))
                 Directory.CreateDirectory("Workers");
-            string[] ret = new string[maxjumpnum + 4];
-            ret[0] = save.name;
-            ret[1] = save.jumprange.ToString();
-            ret[2] = user.x.ToString() + ", " + user.y.ToString() + ", " + user.z.ToString();
-            ret[3] = save.x.ToString() + ", " + save.y.ToString() + ", " + save.z.ToString();
             for (int i = 4; i != (maxjumpnum + 4); i++)
-                ret[i] = save.history[i - 4].query + ", " +  save.history[i - 4].resultnum.ToString() + ", " + save.history[i - 4].time.TotalMilliseconds;
-            File.WriteAllLines("workers\\"+save.name, ret);
+                writer.Add(save.name + ", " + (i - 4) + ", " + save.history[i - 4].query + ", " + save.history[i - 4].resultnum.ToString() + ", " + save.history[i - 4].time.TotalMilliseconds);
         }
         public static user_st work(user_st user)
         {
