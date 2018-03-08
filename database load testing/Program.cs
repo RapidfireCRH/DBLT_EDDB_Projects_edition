@@ -13,7 +13,7 @@ namespace database_load_testing
     class Program
     {
         public static readonly int[] query_size = { 50, 61,  83,  127, 215, 391, 743, 1447, 2855, 5671};
-        static readonly int usernum = 5;//Number of user to simulate
+        static readonly int usernum = 100;//Number of user to simulate
         static readonly int maxjumpnum = 10;
         public struct user_st
         {
@@ -162,7 +162,7 @@ namespace database_load_testing
                     user.jumpnum++;
                 }
                 else
-                    Thread.Sleep(user.lastjump.Add(user.next_query_time) - DateTime.Now);
+                    Thread.Sleep(((user.lastjump.Add(user.next_query_time) - DateTime.Now).TotalSeconds > new TimeSpan(0,0,2).TotalSeconds ? (user.lastjump.Add(user.next_query_time) - DateTime.Now) : new TimeSpan(1)));
             }
             return user;
         }
