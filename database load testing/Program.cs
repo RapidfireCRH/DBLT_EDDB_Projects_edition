@@ -154,9 +154,9 @@ namespace database_load_testing
                     //cleanup, prep next jump
                     conn.Close();
                     user.history[user.jumpnum].time = DateTime.Now - start;
-                    if (user.history[user.jumpnum].resultnum < 15)
+                    if (user.history[user.jumpnum].resultnum < 15 && user.query > 0)
                         user.query++;
-                    else if (user.history[user.jumpnum].resultnum > 100)
+                    else if (user.history[user.jumpnum].resultnum > 100 && user.query < 10)
                         user.query--;
                     user.jumpnum++;
                 }
