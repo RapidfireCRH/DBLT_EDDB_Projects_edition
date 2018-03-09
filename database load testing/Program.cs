@@ -161,8 +161,7 @@ namespace database_load_testing
                         user.query++;
                     else if (user.history[user.jumpnum].resultnum > 100 && user.query > 0)
                         user.query--;
-                    if (user.history[user.jumpnum].resultnum != 0)//If i get 0 results, run again
-                        user.jumpnum++;
+                    user.jumpnum++;
                 }
                 else
                     Thread.Sleep(((user.lastjump.Add(user.next_query_time) - DateTime.Now).TotalSeconds > new TimeSpan(0,0,2).TotalSeconds ? (user.lastjump.Add(user.next_query_time) - DateTime.Now) : new TimeSpan(1)));
