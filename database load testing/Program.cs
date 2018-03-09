@@ -34,6 +34,7 @@ namespace database_load_testing
             public string query;
             public int resultnum;
             public TimeSpan time;
+            public int radius;
         }
         public struct star_st
         {
@@ -65,7 +66,7 @@ namespace database_load_testing
             //init
             Random r = new Random((int)DateTime.Today.Ticks);
             List<Thread> group = new List<Thread>();
-            writer.Add("User, Jump Number, Query, Result Number, Delay");
+            writer.Add("User, Jump Number, Radius, Query, Result Number, Delay");
             for(int i = 0; i!= usernum; i++)
             {
                 user_st user = new user_st();
@@ -106,8 +107,8 @@ namespace database_load_testing
             user_st save = work(user);
             if (!Directory.Exists("Workers"))
                 Directory.CreateDirectory("Workers");
-            for (int i = 4; i != (maxjumpnum + 4); i++)
-                writer.Add(save.name + ", " + (i - 4) + ", " + save.history[i - 4].query + ", " + save.history[i - 4].resultnum.ToString() + ", " + save.history[i - 4].time.TotalMilliseconds);
+            for (int i = 0; i != (maxjumpnum); i++)
+                writer.Add(save.name + ", " + (i) + ", " + save.history[i].radius + "," + save.history[i].query + ", " + save.history[i].resultnum.ToString() + ", " + save.history[i].time.TotalMilliseconds);
         }
         public static user_st work(user_st user)
         {
@@ -132,6 +133,7 @@ namespace database_load_testing
                     curr.coord.y = user.y;
                     curr.coord.z = user.z;
                     //query
+                    user.history[user.jumpnum].radius = queryRadius[user.query];
                     DateTime start = DateTime.Now;
                     user.history[user.jumpnum].query = "SELECT * FROM systems WHERE " +
                         "systems.x BETWEEN " + (user.x - queryRadius[user.query]) + " AND " + (user.x + queryRadius[user.query]) + " AND " +
