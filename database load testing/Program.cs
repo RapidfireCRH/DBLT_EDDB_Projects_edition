@@ -13,7 +13,7 @@ namespace database_load_testing
     class Program
     {
         public static readonly int[] queryRadius = { 50, 61,  83,  127, 215, 391, 743, 1447, 2855, 5671};
-        static readonly int usernum = 200;//Number of user to simulate
+        static readonly int usernum = 1000;//Number of user to simulate
         static readonly bool jumptoggle = false;//Toggle number of jumps
         static readonly int maxjumpnum = 300;
         static readonly int totalminutes = 1;//How long to run, requires jumptoggle to be false. In minutes
@@ -38,6 +38,8 @@ namespace database_load_testing
             public int resultnum;
             public TimeSpan time;
             public int radius;
+            public bool error_bool;
+            public string error_string;
         }
         public struct star_st
         {
@@ -120,7 +122,7 @@ namespace database_load_testing
             lock (writer)
             {
                 foreach(history_st x in save.history)
-                    writer.Add(save.name + ", " + x.jumpnum + ", " + x.radius + "," + x.query + ", " + x.resultnum.ToString() + ", " + x.time.TotalMilliseconds);
+                    writer.Add(save.name + ", " + x.jumpnum + ", " + x.radius + "," + x.query + ", " + x.resultnum.ToString() + ", " + x.time.TotalMilliseconds +(!x.error_bool?"":x.error_string));
             }
         }
         public static user_st work(user_st user)
@@ -154,23 +156,33 @@ namespace database_load_testing
                         "systems.x BETWEEN " + (user.x - queryRadius[user.query]) + " AND " + (user.x + queryRadius[user.query]) + " AND " +
                         "systems.y BETWEEN " + (user.y - queryRadius[user.query]) + " AND " + (user.y + queryRadius[user.query]) + " AND " +
                         "systems.z BETWEEN " + (user.z - queryRadius[user.query]) + " AND " + (user.z + queryRadius[user.query] + " AND deleted_at is NULL;");
-                    NpgsqlConnection conn = new NpgsqlConnection("Pooling=false; SERVER=cyberlord.de; Port=5432; Database=edmc_rse_db; User ID=edmc_rse_user; Password=asdfplkjiouw3875948zksmdxnf;Timeout=12;Application Name=stresstest-" + user.name);
-                    conn.Open();
-                    NpgsqlTransaction tran = conn.BeginTransaction();
-                    NpgsqlCommand command = new NpgsqlCommand(next.query, conn);
-                    NpgsqlDataReader read = command.ExecuteReader();
-                    while (read.Read())
+                    try
                     {
-                        check_st ret = new check_st();
-                        ret.star.name = read["name"].ToString();
-                        ret.star.coord.x = Double.Parse(read["x"].ToString(), CultureInfo.InvariantCulture);
-                        ret.star.coord.y = Double.Parse(read["y"].ToString(), CultureInfo.InvariantCulture);
-                        ret.star.coord.z = Double.Parse(read["z"].ToString(), CultureInfo.InvariantCulture);
-                        ret.dist = ret.star.distance(curr);
-                        next.resultnum++;
+                        NpgsqlConnection conn = new NpgsqlConnection("Pooling=false; SERVER=cyberlord.de; Port=5432; Database=edmc_rse_db; User ID=edmc_rse_user; Password=asdfplkjiouw3875948zksmdxnf;Timeout=12;Application Name=stresstest-" + user.name);
+                        conn.Open();
+                        NpgsqlTransaction tran = conn.BeginTransaction();
+                        NpgsqlCommand command = new NpgsqlCommand(next.query, conn);
+                        NpgsqlDataReader read = command.ExecuteReader();
+                        while (read.Read())
+                        {
+                            check_st ret = new check_st();
+                            ret.star.name = read["name"].ToString();
+                            ret.star.coord.x = Double.Parse(read["x"].ToString(), CultureInfo.InvariantCulture);
+                            ret.star.coord.y = Double.Parse(read["y"].ToString(), CultureInfo.InvariantCulture);
+                            ret.star.coord.z = Double.Parse(read["z"].ToString(), CultureInfo.InvariantCulture);
+                            ret.dist = ret.star.distance(curr);
+                            next.resultnum++;
+                        }
+                        //cleanup, prep next jump
+                        conn.Close();
+                        next.error_bool = false;
                     }
-                    //cleanup, prep next jump
-                    conn.Close();
+                    catch (Exception e)
+                    {
+                        next.resultnum = -1;
+                        next.error_bool = true;
+                        next.error_string = e.Message;
+                    }
                     next.time = DateTime.Now - start;
                     next.jumpnum = user.jumpnum;
                     user.history.Add(next);
