@@ -121,8 +121,8 @@ namespace database_load_testing
                 Directory.CreateDirectory("Workers");
             lock (writer)
             {
-                foreach(history_st x in save.history)
-                    writer.Add(save.name + ", " + x.jumpnum + ", " + x.radius + "," + x.query + ", " + x.resultnum.ToString() + ", " + x.time.TotalMilliseconds +(!x.error_bool?"":x.error_string));
+                foreach (history_st x in save.history)
+                    writer.Add(save.name + ", " + x.jumpnum + ", " + x.radius + "," + x.query + ", " + x.resultnum.ToString() + ", " + x.time.TotalMilliseconds + (!x.error_bool ? "" : ", " + x.error_string));
             }
         }
         public static user_st work(user_st user)
