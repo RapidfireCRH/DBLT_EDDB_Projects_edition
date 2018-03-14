@@ -13,7 +13,7 @@ namespace database_load_testing
     class Program
     {
         public static readonly int[] queryRadius = { 50, 61,  83,  127, 215, 391, 743, 1447, 2855, 5671};
-        static readonly int usernum = 1000;//Number of user to simulate
+        static readonly int usernum = 200;//Number of user to simulate
         static readonly bool jumptoggle = false;//Toggle number of jumps
         static readonly int maxjumpnum = 300;
         static readonly int totalminutes = 1;//How long to run, requires jumptoggle to be false. In minutes
@@ -117,8 +117,6 @@ namespace database_load_testing
         public static void worker(user_st user)
         {
             user_st save = work(user);
-            if (!Directory.Exists("Workers"))
-                Directory.CreateDirectory("Workers");
             lock (writer)
             {
                 foreach (history_st x in save.history)
